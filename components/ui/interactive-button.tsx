@@ -17,9 +17,12 @@ export const InteractiveButton = ({
   [key: string]: any
 }) => {
   const variants = {
-    primary: "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white",
-    secondary: "bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white",
-    ghost: "border-2 border-green-300 text-green-600 hover:bg-green-50",
+    primary:
+      "bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 hover:from-purple-700 hover:via-pink-700 hover:to-orange-700 text-white font-semibold shadow-lg shadow-purple-500/25 hover:shadow-pink-500/35",
+    secondary:
+      "bg-gradient-to-r from-orange-600 via-pink-600 to-purple-600 hover:from-orange-700 hover:via-pink-700 hover:to-purple-700 text-white font-semibold shadow-lg shadow-orange-500/25 hover:shadow-pink-500/35",
+    ghost:
+      "border-2 border-purple-300 text-purple-600 hover:bg-gradient-to-r hover:from-purple-600 hover:via-pink-600 hover:to-orange-600 hover:border-transparent hover:text-white hover:shadow-lg hover:shadow-purple-500/25",
   }
 
   const sizes = {
@@ -32,7 +35,7 @@ export const InteractiveButton = ({
     <motion.button
       whileHover={{ scale: 1.05, y: -2 }}
       whileTap={{ scale: 0.95 }}
-      className={`rounded-xl font-semibold transition-all duration-300 shadow-lg hover:shadow-xl ${variants[variant]} ${sizes[size]} ${className}`}
+      className={`rounded-xl font-semibold transition-all duration-300 ${variants[variant]} ${sizes[size]} ${className}`}
       {...props}
     >
       {children}
