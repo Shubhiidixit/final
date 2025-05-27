@@ -47,6 +47,14 @@ import { FloatingActionButton } from "@/components/ui/floating-action-button"
 const AutoFlipCard = ({ feature, index }: { feature: any; index: number }) => {
   const [isFlipped, setIsFlipped] = useState(false)
 
+  const colors = [
+    { front: "from-purple-600 to-pink-600", back: "from-purple-600 to-pink-600", border: "border-purple-200" },
+    { front: "from-orange-600 to-pink-600", back: "from-orange-600 to-pink-600", border: "border-orange-200" },
+    { front: "from-pink-600 to-purple-600", back: "from-pink-600 to-purple-600", border: "border-pink-200" },
+  ]
+
+  const color = colors[index % colors.length]
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
@@ -63,12 +71,18 @@ const AutoFlipCard = ({ feature, index }: { feature: any; index: number }) => {
       >
         {/* Front of card */}
         <div className="absolute inset-0 w-full h-full backface-hidden">
-          <Card className="h-full bg-white border-2 border-green-200 hover:border-green-300 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/20">
+          <Card
+            className={`h-full bg-white border-2 ${color.border} hover:border-purple-300 transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/20`}
+          >
             <CardContent className="flex flex-col items-center justify-center h-full p-8">
-              <div className="mx-auto mb-6 p-4 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl w-20 h-20 flex items-center justify-center">
+              <div
+                className={`mx-auto mb-6 p-4 bg-gradient-to-br ${color.front} rounded-2xl w-20 h-20 flex items-center justify-center shadow-lg shadow-purple-500/20`}
+              >
                 <feature.icon className="h-10 w-10 text-white" />
               </div>
-              <CardTitle className="text-2xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent text-center">
+              <CardTitle
+                className={`text-2xl font-bold bg-gradient-to-r ${color.front} bg-clip-text text-transparent text-center`}
+              >
                 {feature.title}
               </CardTitle>
             </CardContent>
@@ -77,14 +91,14 @@ const AutoFlipCard = ({ feature, index }: { feature: any; index: number }) => {
 
         {/* Back of card */}
         <div className="absolute inset-0 w-full h-full backface-hidden rotate-y-180">
-          <Card className="h-full bg-gradient-to-br from-green-600 to-green-700 text-white border-2 border-green-400">
+          <Card className={`h-full bg-gradient-to-br ${color.back} text-white border-2 border-white/50 shadow-lg`}>
             <CardContent className="space-y-6 flex flex-col justify-center h-full p-8">
               <div className="text-center">
                 <div className="mx-auto mb-4 p-4 bg-white/20 rounded-2xl w-16 h-16 flex items-center justify-center">
                   <feature.icon className="h-8 w-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-4">{feature.title}</h3>
-                <p className="text-green-100 text-lg leading-relaxed">{feature.description}</p>
+                <p className="text-white/90 text-lg leading-relaxed">{feature.description}</p>
               </div>
             </CardContent>
           </Card>
@@ -95,24 +109,28 @@ const AutoFlipCard = ({ feature, index }: { feature: any; index: number }) => {
 }
 
 // Integration Card Component
-const IntegrationCard = ({ integration, index }: { integration: any; index: number }) => (
-  <motion.div
-    initial={{ opacity: 0, scale: 0.8 }}
-    whileInView={{ opacity: 1, scale: 1 }}
-    transition={{ delay: index * 0.05 }}
-    whileHover={{ scale: 1.05, y: -5 }}
-    className="group cursor-pointer"
-  >
-    <Card className="p-6 bg-white border-2 border-green-200 hover:border-green-300 transition-all duration-300 group-hover:shadow-lg">
-      <div className="text-center space-y-3">
-        <div className="mx-auto w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center">
-          <integration.icon className="h-6 w-6 text-green-600" />
+const IntegrationCard = ({ integration, index }: { integration: any; index: number }) => {
+  const iconColors = ["text-purple-600", "text-orange-600", "text-pink-600", "text-purple-600"]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      transition={{ delay: index * 0.05 }}
+      whileHover={{ scale: 1.05, y: -5 }}
+      className="group cursor-pointer"
+    >
+      <Card className="p-6 bg-white transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/20 border-2 border-gray-200">
+        <div className="text-center space-y-3">
+          <div className="mx-auto w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-gray-200">
+            <integration.icon className={`h-6 w-6 ${iconColors[index % iconColors.length]}`} />
+          </div>
+          <h4 className="font-semibold text-gray-700">{integration.name}</h4>
         </div>
-        <h4 className="font-semibold text-gray-900">{integration.name}</h4>
-      </div>
-    </Card>
-  </motion.div>
-)
+      </Card>
+    </motion.div>
+  )
+}
 
 // Contact Form Component
 const ContactForm = () => {
@@ -135,47 +153,55 @@ const ContactForm = () => {
   }
 
   return (
-    <Card className="p-8 bg-white border-2 border-green-200">
+    <Card className="p-8 bg-white border-2 border-gray-200 shadow-lg shadow-purple-500/10">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name *</Label>
+            <Label htmlFor="name" className="text-gray-700">
+              Name *
+            </Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="border-green-200 focus:border-green-400"
+              className="border-gray-300 focus:border-purple-500 bg-white"
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="email" className="text-gray-700">
+              Email *
+            </Label>
             <Input
               id="email"
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              className="border-green-200 focus:border-green-400"
+              className="border-gray-300 focus:border-purple-500 bg-white"
               required
             />
           </div>
         </div>
         <div className="space-y-2">
-          <Label htmlFor="company">Company</Label>
+          <Label htmlFor="company" className="text-gray-700">
+            Company
+          </Label>
           <Input
             id="company"
             value={formData.company}
             onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-            className="border-green-200 focus:border-green-400"
+            className="border-gray-300 focus:border-purple-500 bg-white"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="message">Message *</Label>
+          <Label htmlFor="message" className="text-gray-700">
+            Message *
+          </Label>
           <Textarea
             id="message"
             value={formData.message}
             onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-            className="border-green-200 focus:border-green-400 min-h-[120px]"
+            className="border-gray-300 focus:border-purple-500 bg-white min-h-[120px]"
             required
           />
         </div>
@@ -224,11 +250,11 @@ export default function OnCallMateLanding() {
           <motion.div
             whileHover={{ rotate: 360, scale: 1.1 }}
             transition={{ duration: 0.5 }}
-            className="p-2 bg-gradient-to-r from-green-600 to-green-700 rounded-lg"
+            className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg shadow-purple-500/20"
           >
             <AlertTriangle className="h-6 w-6 text-white" />
           </motion.div>
-          <span className="ml-3 text-xl font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+          <span className="ml-3 text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             OnCall Mate
           </span>
         </div>
@@ -244,14 +270,14 @@ export default function OnCallMateLanding() {
                 backgroundPosition: ["0% 0%", "100% 100%"],
               }}
               transition={{
-                duration: 20,
+                duration: 30,
                 repeat: Number.POSITIVE_INFINITY,
                 repeatType: "reverse",
               }}
-              className="absolute inset-0 opacity-30"
+              className="absolute inset-0 opacity-3"
               style={{
-                backgroundImage: "radial-gradient(circle at 1px 1px, rgba(34, 197, 94, 0.15) 1px, transparent 0)",
-                backgroundSize: "50px 50px",
+                backgroundImage: "radial-gradient(circle at 1px 1px, rgba(168, 85, 247, 0.1) 1px, transparent 0)",
+                backgroundSize: "60px 60px",
               }}
             />
           </div>
@@ -274,11 +300,11 @@ export default function OnCallMateLanding() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 }}
-                    className="text-lg text-green-600 font-medium mb-2 tracking-wide uppercase"
+                    className="text-lg text-gray-600 font-medium mb-2 tracking-wide uppercase"
                   >
                     We are launching
                   </motion.p>
-                  <span className="bg-gradient-to-r from-green-600 via-green-700 to-green-600 bg-clip-text text-transparent">
+                  <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
                     OnCall Mate
                   </span>
                 </motion.h1>
@@ -286,7 +312,7 @@ export default function OnCallMateLanding() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 }}
-                  className="text-2xl text-gray-600 sm:text-3xl md:text-4xl font-medium"
+                  className="text-2xl text-gray-700 sm:text-3xl md:text-4xl font-medium"
                 >
                   When Alerts Meet Intelligence
                 </motion.p>
@@ -317,13 +343,13 @@ export default function OnCallMateLanding() {
         </section>
 
         {/* Problem Statement */}
-        <LazySection className="w-full py-12 md:py-24 lg:py-32 relative bg-gradient-to-br from-green-50 to-green-100">
+        <LazySection className="w-full py-12 md:py-24 lg:py-32 relative bg-white">
           <div className="container px-4 md:px-6 relative">
             <div className="text-center mb-12">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent"
+                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent"
               >
                 The Challenge We're Solving
               </motion.h2>
@@ -339,12 +365,16 @@ export default function OnCallMateLanding() {
                   description:
                     "SREs face a deluge of alerts from tools like Grafana, Prometheus, Datadog. Many alerts are not critical leading to noise.",
                   stat: "300+ alerts/day average",
+                  color: "from-purple-600 to-pink-600",
+                  borderColor: "border-purple-200",
                 },
                 {
                   icon: Clock,
                   title: "Knowledge gaps between SREs",
                   description: "Junior SREs often lack the expertise. This results in delays and extended downtime.",
                   stat: "45min average MTTR",
+                  color: "from-orange-600 to-pink-600",
+                  borderColor: "border-orange-200",
                 },
                 {
                   icon: Users,
@@ -352,6 +382,8 @@ export default function OnCallMateLanding() {
                   description:
                     "Lack of documented solutions leads to frequent escalations. Senior engineers are diverted from critical tasks affecting productivity.",
                   stat: "60% communication gaps",
+                  color: "from-pink-600 to-purple-600",
+                  borderColor: "border-pink-200",
                 },
               ].map((problem, index) => (
                 <motion.div
@@ -362,13 +394,17 @@ export default function OnCallMateLanding() {
                   whileHover={{ y: -10, scale: 1.02 }}
                   className="group"
                 >
-                  <Card className="p-8 h-full bg-white border-2 border-green-200 hover:border-green-300 group-hover:shadow-2xl transition-all duration-300">
+                  <Card
+                    className={`p-8 h-full bg-white border-2 ${problem.borderColor} hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300`}
+                  >
                     <div className="text-center space-y-4">
-                      <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center">
+                      <div
+                        className={`mx-auto w-16 h-16 bg-gradient-to-br ${problem.color} rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20`}
+                      >
                         <problem.icon className="h-8 w-8 text-white" />
                       </div>
-                      <h3 className="text-xl font-bold text-green-800">{problem.title}</h3>
-                      <Badge className="bg-green-100 text-green-800 border-green-200">{problem.stat}</Badge>
+                      <h3 className="text-xl font-bold text-gray-800">{problem.title}</h3>
+                      <Badge className={`bg-gradient-to-r ${problem.color} text-white border-0`}>{problem.stat}</Badge>
                       <p className="text-gray-600 leading-relaxed">{problem.description}</p>
                     </div>
                   </Card>
@@ -385,7 +421,7 @@ export default function OnCallMateLanding() {
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent"
+                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent"
               >
                 Key Features
               </motion.h2>
@@ -403,18 +439,15 @@ export default function OnCallMateLanding() {
         </LazySection>
 
         {/* Solution Section */}
-        <LazySection
-          id="solution"
-          className="w-full py-12 md:py-24 lg:py-32 relative bg-gradient-to-br from-green-50 to-green-100"
-        >
+        <LazySection id="solution" className="w-full py-12 md:py-24 lg:py-32 relative bg-white">
           <div className="container px-4 md:px-6 relative">
             <div className="max-w-6xl mx-auto text-center">
               <div className="mb-12">
-                <Badge className="bg-green-100 text-green-800 border-green-200 mb-4">
+                <Badge className="bg-gradient-to-r from-purple-600 to-pink-600 text-white border-0 mb-4">
                   <Wand2 className="h-4 w-4 mr-2" />
                   Our Solution
                 </Badge>
-                <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                <h2 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent">
                   Intelligent Incident Response, Simplified
                 </h2>
                 <p className="text-gray-600 md:text-xl leading-relaxed mb-8 max-w-4xl mx-auto">
@@ -430,18 +463,21 @@ export default function OnCallMateLanding() {
                     title: "AI powered automated responses",
                     description:
                       "Integrated AI agent to automatically respond to alerts via emails, Slack and Outlook. Provide step-by-step resolutions for alerts reducing response time and manual effort.",
+                    color: "from-purple-600 to-pink-600",
                   },
                   {
                     icon: ZapIcon,
                     title: "Centralized knowledge database",
                     description:
                       "Maintain a database of previously resolved issues for quick reference. Utilized Redis in-memory DB for faster query processing, cost efficient, and efficient data retrieval between LLM and backend.",
+                    color: "from-orange-600 to-pink-600",
                   },
                   {
                     icon: Activity,
                     title: "Streamlined alert resolution",
                     description:
                       "Ensure consistent and accurate responses to common alerts. Minimize unnecessary escalations by equipping SREs with immediate solutions.",
+                    color: "from-pink-600 to-purple-600",
                   },
                 ].map((benefit, index) => (
                   <motion.div
@@ -452,10 +488,12 @@ export default function OnCallMateLanding() {
                     whileHover={{ y: -5 }}
                     className="text-center space-y-4"
                   >
-                    <div className="bg-gradient-to-br from-green-500 to-green-600 p-4 rounded-xl w-16 h-16 mx-auto flex items-center justify-center">
+                    <div
+                      className={`bg-gradient-to-br ${benefit.color} p-4 rounded-xl w-16 h-16 mx-auto flex items-center justify-center shadow-lg shadow-purple-500/20`}
+                    >
                       <benefit.icon className="h-8 w-8 text-white" />
                     </div>
-                    <h3 className="font-semibold text-gray-900 text-lg">{benefit.title}</h3>
+                    <h3 className="font-semibold text-gray-800 text-lg">{benefit.title}</h3>
                     <p className="text-gray-600 text-sm leading-relaxed">{benefit.description}</p>
                   </motion.div>
                 ))}
@@ -471,7 +509,7 @@ export default function OnCallMateLanding() {
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent"
+                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent"
               >
                 Business Value & Impact
               </motion.h2>
@@ -487,6 +525,8 @@ export default function OnCallMateLanding() {
                   description:
                     "Minimize alert fatigue and improve team well-being with intelligent filtering and automated responses",
                   metric: "70% less stress",
+                  color: "from-pink-600 to-purple-600",
+                  borderColor: "border-pink-200",
                 },
                 {
                   icon: Zap,
@@ -494,6 +534,8 @@ export default function OnCallMateLanding() {
                   description:
                     "Accelerate incident response with automated workflows, AI assistance, and step-by-step guidance",
                   metric: "3x faster MTTR",
+                  color: "from-orange-600 to-pink-600",
+                  borderColor: "border-orange-200",
                 },
                 {
                   icon: BookOpen,
@@ -501,12 +543,16 @@ export default function OnCallMateLanding() {
                   description:
                     "Build institutional knowledge that stays with your organization through centralized documentation",
                   metric: "90% knowledge preserved",
+                  color: "from-purple-600 to-pink-600",
+                  borderColor: "border-purple-200",
                 },
                 {
                   icon: CreditCard,
                   title: "Cost Efficiency",
                   description: "Reduce operational costs through intelligent automation and improved team efficiency",
                   metric: "40% cost reduction",
+                  color: "from-pink-600 to-orange-600",
+                  borderColor: "border-pink-200",
                 },
               ].map((value, index) => (
                 <motion.div
@@ -517,13 +563,17 @@ export default function OnCallMateLanding() {
                   whileHover={{ y: -10, scale: 1.02 }}
                   className="group"
                 >
-                  <Card className="p-8 h-full bg-white border-2 border-green-200 hover:border-green-300 group-hover:shadow-2xl transition-all duration-300">
+                  <Card
+                    className={`p-8 h-full bg-white border-2 ${value.borderColor} hover:shadow-xl hover:shadow-purple-500/20 transition-all duration-300`}
+                  >
                     <div className="text-center space-y-6">
-                      <div className="mx-auto w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center">
+                      <div
+                        className={`mx-auto w-16 h-16 bg-gradient-to-br ${value.color} rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20`}
+                      >
                         <value.icon className="h-8 w-8 text-white" />
                       </div>
-                      <h3 className="text-xl font-bold text-green-800">{value.title}</h3>
-                      <Badge className="bg-green-100 text-green-800 border-green-200 text-sm px-3 py-1">
+                      <h3 className="text-xl font-bold text-gray-800">{value.title}</h3>
+                      <Badge className={`bg-gradient-to-r ${value.color} text-white border-0 text-sm px-3 py-1`}>
                         {value.metric}
                       </Badge>
                       <p className="text-gray-600 leading-relaxed">{value.description}</p>
@@ -536,16 +586,13 @@ export default function OnCallMateLanding() {
         </LazySection>
 
         {/* Future Scope Section */}
-        <LazySection
-          id="roadmap"
-          className="w-full py-12 md:py-24 lg:py-32 relative bg-gradient-to-br from-green-50 to-green-100"
-        >
+        <LazySection id="roadmap" className="w-full py-12 md:py-24 lg:py-32 relative bg-white">
           <div className="container px-4 md:px-6 relative">
             <div className="text-center mb-12">
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent"
+                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent"
               >
                 Future Scope & Roadmap
               </motion.h2>
@@ -561,6 +608,8 @@ export default function OnCallMateLanding() {
                   title: "Holistic Monitoring Approach",
                   description: "Alert on metrics, traces, logs for holistic issue detection with all combined",
                   timeline: "Q2 2025",
+                  color: "from-purple-600 to-pink-600",
+                  borderColor: "border-purple-200",
                   features: [
                     "Metrics monitoring and alerting",
                     "Distributed tracing integration",
@@ -573,6 +622,8 @@ export default function OnCallMateLanding() {
                   title: "Multiple Channel Notification Integration",
                   description: "Notify via Outlook, Slack, Gmail, Teams for timely communication",
                   timeline: "Q3 2025",
+                  color: "from-orange-600 to-pink-600",
+                  borderColor: "border-orange-200",
                   features: [
                     "Microsoft Outlook integration",
                     "Slack real-time notifications",
@@ -585,6 +636,8 @@ export default function OnCallMateLanding() {
                   title: "Adaptive Learning System",
                   description: "Use on-call feedback and reinforcement learning to improve responses",
                   timeline: "Q4 2025",
+                  color: "from-pink-600 to-purple-600",
+                  borderColor: "border-pink-200",
                   features: [
                     "On-call engineer feedback collection",
                     "Reinforcement learning algorithms",
@@ -597,6 +650,8 @@ export default function OnCallMateLanding() {
                   title: "Streamlined Incident Response",
                   description: "Integrate with PagerDuty, Opsgenie for rapid alert escalation",
                   timeline: "Q1 2026",
+                  color: "from-purple-600 to-orange-600",
+                  borderColor: "border-purple-200",
                   features: [
                     "PagerDuty escalation policies",
                     "Opsgenie incident management",
@@ -613,22 +668,26 @@ export default function OnCallMateLanding() {
                   className={`flex items-center gap-8 ${index % 2 === 1 ? "flex-row-reverse" : ""}`}
                 >
                   <div className="flex-1">
-                    <Card className="p-6 bg-white border-2 border-green-200">
+                    <Card className={`p-6 bg-white border-2 ${item.borderColor} shadow-lg shadow-purple-500/10`}>
                       <div className="flex items-start space-x-4">
-                        <div className="bg-gradient-to-br from-green-500 to-green-600 p-3 rounded-xl">
+                        <div
+                          className={`bg-gradient-to-br ${item.color} p-3 rounded-xl shadow-lg shadow-purple-500/20`}
+                        >
                           <item.icon className="h-6 w-6 text-white" />
                         </div>
                         <div className="flex-1">
                           <div className="flex items-center justify-between mb-2">
-                            <h3 className="text-xl font-bold text-gray-900">{item.title}</h3>
-                            <Badge className="bg-green-100 text-green-800 border-green-200">{item.timeline}</Badge>
+                            <h3 className="text-xl font-bold text-gray-800">{item.title}</h3>
+                            <Badge className={`bg-gradient-to-r ${item.color} text-white border-0`}>
+                              {item.timeline}
+                            </Badge>
                           </div>
                           <p className="text-gray-600 mb-4">{item.description}</p>
                           <div className="space-y-2">
                             {item.features.map((feature, idx) => (
                               <div key={idx} className="flex items-center space-x-2">
-                                <CheckCircle className="h-4 w-4 text-green-600" />
-                                <span className="text-sm text-gray-700">{feature}</span>
+                                <CheckCircle className="h-4 w-4 text-purple-500" />
+                                <span className="text-sm text-gray-600">{feature}</span>
                               </div>
                             ))}
                           </div>
@@ -640,7 +699,7 @@ export default function OnCallMateLanding() {
                     <motion.div
                       animate={{ scale: [1, 1.1, 1] }}
                       transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
-                      className="w-4 h-4 bg-gradient-to-r from-green-500 to-green-600 rounded-full"
+                      className={`w-4 h-4 bg-gradient-to-r ${item.color} rounded-full shadow-lg shadow-purple-500/30`}
                     />
                   </div>
                 </motion.div>
@@ -656,7 +715,7 @@ export default function OnCallMateLanding() {
               <motion.h2
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent"
+                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent"
               >
                 Seamless Integrations
               </motion.h2>
@@ -688,37 +747,21 @@ export default function OnCallMateLanding() {
                 { name: "Gemini", icon: Sparkles },
                 { name: "Redis", icon: Database },
               ].map((integration, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: index * 0.02 }}
-                  whileHover={{ scale: 1.05, y: -5 }}
-                  className="group cursor-pointer"
-                >
-                  <Card className="p-8 bg-white border-2 border-green-200 hover:border-green-300 transition-all duration-300 group-hover:shadow-lg h-32">
-                    <div className="text-center space-y-3 h-full flex flex-col justify-center">
-                      <div className="mx-auto w-12 h-12 bg-gradient-to-br from-green-100 to-green-200 rounded-xl flex items-center justify-center">
-                        <integration.icon className="h-6 w-6 text-green-600" />
-                      </div>
-                      <h4 className="font-semibold text-gray-900 text-sm">{integration.name}</h4>
-                    </div>
-                  </Card>
-                </motion.div>
+                <IntegrationCard key={index} integration={integration} index={index} />
               ))}
             </div>
           </div>
         </LazySection>
 
         {/* Contact Section */}
-        <LazySection className="w-full py-12 md:py-24 lg:py-32 relative bg-gradient-to-br from-green-50 to-green-100">
+        <LazySection className="w-full py-12 md:py-24 lg:py-32 relative bg-white">
           <div className="container px-4 md:px-6 relative">
             <div className="max-w-4xl mx-auto">
               <div className="text-center mb-12">
                 <motion.h2
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent"
+                  className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent"
                 >
                   Get in Touch
                 </motion.h2>
@@ -734,13 +777,13 @@ export default function OnCallMateLanding() {
                     whileInView={{ opacity: 1, x: 0 }}
                     className="flex items-start space-x-4"
                   >
-                    <div className="bg-gradient-to-br from-green-500 to-green-600 p-3 rounded-xl">
+                    <div className="bg-gradient-to-br from-purple-600 to-pink-600 p-3 rounded-xl shadow-lg shadow-purple-500/20">
                       <Mail className="h-6 w-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 mb-1">Email Us</h3>
+                      <h3 className="font-semibold text-gray-800 mb-1">Email Us</h3>
                       <p className="text-gray-600 text-sm mb-1">Get in touch with our team</p>
-                      <p className="text-green-600 font-medium">hello@oncallmate.com</p>
+                      <p className="text-purple-600 font-medium">hello@oncallmate.com</p>
                     </div>
                   </motion.div>
                 </div>
@@ -755,15 +798,15 @@ export default function OnCallMateLanding() {
       </main>
 
       {/* Enhanced Footer */}
-      <footer className="py-12 border-t border-green-200 relative bg-white">
+      <footer className="py-12 border-t border-gray-200 relative bg-white">
         <div className="container px-4 md:px-6 relative">
           <div className="grid gap-8 lg:grid-cols-4">
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <div className="p-2 bg-gradient-to-r from-green-600 to-green-700 rounded-lg">
+                <div className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg shadow-purple-500/20">
                   <AlertTriangle className="h-5 w-5 text-white" />
                 </div>
-                <span className="text-lg font-bold bg-gradient-to-r from-green-600 to-green-700 bg-clip-text text-transparent">
+                <span className="text-lg font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                   OnCall Mate
                 </span>
               </div>
@@ -775,7 +818,7 @@ export default function OnCallMateLanding() {
                   <motion.button
                     key={index}
                     whileHover={{ scale: 1.1, y: -2 }}
-                    className="p-2 bg-green-100 text-green-600 rounded-lg hover:bg-green-200 transition-all duration-300"
+                    className="p-2 bg-white text-gray-600 rounded-lg hover:bg-purple-50 hover:text-purple-600 transition-all duration-300 border border-gray-200 shadow-sm"
                   >
                     <Icon className="h-4 w-4" />
                   </motion.button>
@@ -798,13 +841,13 @@ export default function OnCallMateLanding() {
               },
             ].map((section, index) => (
               <div key={index}>
-                <h3 className="font-semibold mb-4 text-gray-900">{section.title}</h3>
+                <h3 className="font-semibold mb-4 text-gray-800">{section.title}</h3>
                 <nav className="flex flex-col space-y-2">
                   {section.links.map((link, linkIndex) => (
                     <Link
                       key={linkIndex}
                       href="#"
-                      className="text-sm text-gray-600 hover:text-green-600 transition-colors flex items-center group"
+                      className="text-sm text-gray-600 hover:text-purple-600 transition-colors flex items-center group"
                     >
                       {link}
                       <ChevronRight className="h-3 w-3 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -815,11 +858,11 @@ export default function OnCallMateLanding() {
             ))}
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-between items-center pt-8 mt-8 border-t border-green-200">
+          <div className="flex flex-col sm:flex-row justify-between items-center pt-8 mt-8 border-t border-gray-200">
             <p className="text-xs text-gray-600">© 2025 OnCall Mate. All rights reserved.</p>
             <nav className="flex gap-4 sm:gap-6 mt-4 sm:mt-0">
               {["Privacy Policy", "Terms of Service", "Cookie Policy"].map((link, index) => (
-                <Link key={index} href="#" className="text-xs text-gray-600 hover:text-green-600 transition-colors">
+                <Link key={index} href="#" className="text-xs text-gray-600 hover:text-purple-600 transition-colors">
                   {link}
                 </Link>
               ))}
