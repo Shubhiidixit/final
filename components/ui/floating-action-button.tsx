@@ -1,3 +1,9 @@
+"use client"
+
+import { useEffect, useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { ArrowUp } from "lucide-react"
+
 export const FloatingActionButton = () => {
   const [isVisible, setIsVisible] = useState(false)
 
@@ -36,7 +42,7 @@ export const FloatingActionButton = () => {
             whileTap={{ scale: 0.9 }}
             className="w-14 h-14 bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 rounded-full shadow-lg shadow-purple-500/30 flex items-center justify-center text-white font-bold"
           >
-            <ArrowUp className="h-6 w-6" />  {/* This is the arrow icon */}
+            <ArrowUp className="h-6 w-6" />
           </motion.button>
         </motion.div>
       )}
