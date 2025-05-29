@@ -30,6 +30,8 @@ import {
   LineChart,
   Search,
   Database,
+  TrendingUp,
+  TrendingDown,
 } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
@@ -220,6 +222,118 @@ const ContactForm = () => {
   )
 }
 
+// Alert Visualization Component
+const AlertVisualization = () => {
+  const alertData = [
+    { time: "00:00", alerts: 45, resolved: 12 },
+    { time: "04:00", alerts: 78, resolved: 23 },
+    { time: "08:00", alerts: 156, resolved: 89 },
+    { time: "12:00", alerts: 234, resolved: 178 },
+    { time: "16:00", alerts: 189, resolved: 156 },
+    { time: "20:00", alerts: 98, resolved: 67 },
+  ]
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 1.2, duration: 0.8 }}
+      className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 border border-purple-200 shadow-lg shadow-purple-500/10"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">Alert Volume (24h)</h3>
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <span className="text-sm text-gray-600">Incoming</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+            <span className="text-sm text-gray-600">Resolved</span>
+          </div>
+        </div>
+      </div>
+      <div className="relative h-32">
+        <svg className="w-full h-full" viewBox="0 0 300 120">
+          {/* Grid lines */}
+          {[0, 1, 2, 3, 4].map((i) => (
+            <line key={i} x1="0" y1={i * 30} x2="300" y2={i * 30} stroke="#f3f4f6" strokeWidth="1" />
+          ))}
+
+          {/* Alert line */}
+          <motion.polyline
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ delay: 1.5, duration: 2 }}
+            fill="none"
+            stroke="#ef4444"
+            strokeWidth="3"
+            points={alertData.map((d, i) => `${i * 50},${120 - (d.alerts / 250) * 120}`).join(" ")}
+          />
+
+          {/* Resolved line */}
+          <motion.polyline
+            initial={{ pathLength: 0 }}
+            animate={{ pathLength: 1 }}
+            transition={{ delay: 1.7, duration: 2 }}
+            fill="none"
+            stroke="#10b981"
+            strokeWidth="3"
+            points={alertData.map((d, i) => `${i * 50},${120 - (d.resolved / 250) * 120}`).join(" ")}
+          />
+
+          {/* Data points */}
+          {alertData.map((d, i) => (
+            <g key={i}>
+              <motion.circle
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 1.5 + i * 0.1 }}
+                cx={i * 50}
+                cy={120 - (d.alerts / 250) * 120}
+                r="4"
+                fill="#ef4444"
+              />
+              <motion.circle
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 1.7 + i * 0.1 }}
+                cx={i * 50}
+                cy={120 - (d.resolved / 250) * 120}
+                r="4"
+                fill="#10b981"
+              />
+            </g>
+          ))}
+        </svg>
+
+        {/* Time labels */}
+        <div className="flex justify-between mt-2 text-xs text-gray-500">
+          {alertData.map((d, i) => (
+            <span key={i}>{d.time}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
+        <div className="text-center">
+          <div className="text-2xl font-bold text-red-500">1.2K</div>
+          <div className="text-xs text-gray-600">Total Alerts</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-green-500">89%</div>
+          <div className="text-xs text-gray-600">Resolved</div>
+        </div>
+        <div className="text-center">
+          <div className="text-2xl font-bold text-orange-500">12m</div>
+          <div className="text-xs text-gray-600">Avg MTTR</div>
+        </div>
+      </div>
+    </motion.div>
+  )
+}
+
 export default function OnCallMateLanding() {
   // Feature data for auto-flip cards
   const features = [
@@ -244,8 +358,6 @@ export default function OnCallMateLanding() {
     <div className="flex flex-col min-h-screen bg-white relative overflow-hidden">
       <FloatingParticles />
 
-      {/* Simplified Header - No top bar, just logo in corner */}
-      {/* Simplified Header with improved buttons */}
       {/* Improved Header with navigation buttons */}
       <header className="absolute top-4 left-4 right-4 z-50 flex justify-between items-center">
         <div className="flex items-center">
@@ -262,6 +374,17 @@ export default function OnCallMateLanding() {
         </div>
 
         <div className="flex items-center space-x-3">
+          <Link href="/teams">
+            <motion.button
+              whileHover={{ scale: 1.05, y: -1 }}
+              whileTap={{ scale: 0.95 }}
+              className="flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg shadow-lg shadow-purple-500/25 transition-all duration-300 border border-purple-500/20"
+            >
+              <Users className="h-4 w-4 mr-2" />
+              <span className="text-sm font-medium">Team</span>
+            </motion.button>
+          </Link>
+
           <motion.a
             href="https://github.com/oncallmate/oncall-mate"
             target="_blank"
@@ -273,92 +396,358 @@ export default function OnCallMateLanding() {
             <ExternalLink className="h-4 w-4 mr-2" />
             <span className="text-sm font-medium">GitHub</span>
           </motion.a>
-
-          <Link href="/teams">
-            <motion.button
-              whileHover={{ scale: 1.05, y: -1 }}
-              whileTap={{ scale: 0.95 }}
-              className="flex items-center px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white rounded-lg shadow-lg shadow-purple-500/25 transition-all duration-300 border border-purple-500/20"
-            >
-              <Users className="h-4 w-4 mr-2" />
-              <span className="text-sm font-medium">Team</span>
-            </motion.button>
-          </Link>
         </div>
       </header>
 
       <main className="flex-1">
-        {/* Hero Section */}
-        <section className="w-full py-12 md:py-24 lg:py-32 xl:py-48 relative overflow-hidden bg-white">
-          {/* Animated Background */}
+        {/* Hero Section - Completely Redesigned */}
+        <section className="w-full min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-50 via-white to-purple-50">
+          {/* Animated Background Elements */}
           <div className="absolute inset-0">
+            {/* Gradient Orbs */}
             <motion.div
               animate={{
-                backgroundPosition: ["0% 0%", "100% 100%"],
+                x: [0, 100, 0],
+                y: [0, -50, 0],
+                scale: [1, 1.2, 1],
               }}
               transition={{
-                duration: 30,
+                duration: 20,
                 repeat: Number.POSITIVE_INFINITY,
-                repeatType: "reverse",
+                ease: "easeInOut",
               }}
-              className="absolute inset-0 opacity-3"
-              style={{
-                backgroundImage: "radial-gradient(circle at 1px 1px, rgba(168, 85, 247, 0.1) 1px, transparent 0)",
-                backgroundSize: "60px 60px",
-              }}
+              className="absolute top-20 left-20 w-72 h-72 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"
             />
-          </div>
-
-          <div className="container px-4 md:px-6 relative">
             <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="flex flex-col items-center space-y-6 text-center"
-            >
-              <div className="space-y-4">
-                <motion.h1
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.4 }}
-                  className="text-5xl font-bold tracking-tighter sm:text-6xl md:text-7xl lg:text-8xl/none"
-                >
-                  <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent">
-                    OnCall Mate
-                  </span>
-                </motion.h1>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 }}
-                  className="text-2xl text-gray-700 sm:text-3xl md:text-4xl font-medium"
-                >
-                  When Alerts Meet Intelligence
-                </motion.p>
-                <motion.p
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.8 }}
-                  className="mx-auto max-w-[800px] text-gray-600 md:text-xl mt-6 leading-relaxed"
-                >
-                  Intelligent alert management system that transforms overwhelming notifications into actionable
-                  insights
-                </motion.p>
-              </div>
+              animate={{
+                x: [0, -80, 0],
+                y: [0, 100, 0],
+                scale: [1, 0.8, 1],
+              }}
+              transition={{
+                duration: 25,
+                repeat: Number.POSITIVE_INFINITY,
+                ease: "easeInOut",
+              }}
+              className="absolute bottom-20 right-20 w-96 h-96 bg-gradient-to-r from-orange-400/20 to-pink-400/20 rounded-full blur-3xl"
+            />
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1 }}
-                className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 mt-8"
-              >
-                <InteractiveButton variant="secondary" size="lg" className="text-lg px-10 py-4">
-                  <BookOpen className="mr-2 h-5 w-5" />
-                  Documentation
-                </InteractiveButton>
-              </motion.div>
-            </motion.div>
+            {/* Grid Pattern */}
+            <div className="absolute inset-0 opacity-5">
+              <div className="grid grid-cols-12 h-full">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <div key={i} className="border-r border-purple-300"></div>
+                ))}
+              </div>
+            </div>
           </div>
+
+          <div className="container px-4 md:px-6 relative z-10 flex items-center min-h-screen">
+            <div className="grid lg:grid-cols-2 gap-16 items-center w-full">
+              {/* Left side - Main Content */}
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="space-y-10"
+              >
+                {/* Badge */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                  className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-purple-600/10 to-pink-600/10 rounded-full border border-purple-200 backdrop-blur-sm"
+                >
+                  <Sparkles className="h-5 w-5 mr-3 text-purple-600" />
+                  <span className="text-purple-700 font-semibold tracking-wide">Meet Our Revolutionary Product</span>
+                </motion.div>
+
+                {/* Main Heading */}
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.4, duration: 0.8 }}
+                  className="space-y-6"
+                >
+                  <h1 className="text-7xl md:text-8xl lg:text-9xl font-black tracking-tight leading-none">
+                    <span className="block bg-gradient-to-r from-purple-600 via-pink-600 to-orange-500 bg-clip-text text-transparent">
+                      OnCall
+                    </span>
+                    <span className="block bg-gradient-to-r from-orange-500 via-pink-600 to-purple-600 bg-clip-text text-transparent">
+                      Mate
+                    </span>
+                  </h1>
+
+                  <div className="space-y-4">
+                    <p className="text-2xl md:text-3xl text-gray-700 font-medium">
+                      Where <span className="text-purple-600 font-bold">Alerts</span> Meet{" "}
+                      <span className="text-orange-600 font-bold">Intelligence</span>
+                    </p>
+
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.8, duration: 0.6 }}
+                      className="relative"
+                    >
+                      <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                        Say{" "}
+                        <span className="relative">
+                          <span className="text-red-500">Goodbye</span>
+                          <motion.div
+                            initial={{ scaleX: 0 }}
+                            animate={{ scaleX: 1 }}
+                            transition={{ delay: 1.2, duration: 0.8 }}
+                            className="absolute bottom-0 left-0 w-full h-1 bg-red-500 origin-left"
+                          />
+                        </span>{" "}
+                        to Alert Fatigue
+                      </h2>
+                      <p className="text-xl text-gray-600 leading-relaxed max-w-2xl">
+                        Transform overwhelming notifications into{" "}
+                        <span className="font-bold text-purple-600">actionable insights</span> with our AI-powered
+                        incident management platform.
+                      </p>
+                    </motion.div>
+                  </div>
+                </motion.div>
+
+                {/* Key Benefits */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1, duration: 0.6 }}
+                  className="grid grid-cols-3 gap-6"
+                >
+                  {[
+                    { icon: TrendingDown, label: "70% Less Noise", color: "text-green-600" },
+                    { icon: TrendingUp, label: "3x Faster MTTR", color: "text-blue-600" },
+                    { icon: Heart, label: "Zero Burnout", color: "text-pink-600" },
+                  ].map((benefit, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 1.2 + index * 0.1 }}
+                      className="text-center p-4 bg-white/60 backdrop-blur-sm rounded-2xl border border-gray-200 shadow-sm"
+                    >
+                      <benefit.icon className={`h-8 w-8 mx-auto mb-2 ${benefit.color}`} />
+                      <p className="font-semibold text-gray-800 text-sm">{benefit.label}</p>
+                    </motion.div>
+                  ))}
+                </motion.div>
+
+                {/* CTA Buttons */}
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.4, duration: 0.6 }}
+                  className="flex flex-col sm:flex-row gap-6"
+                >
+                  <InteractiveButton
+                    variant="primary"
+                    size="lg"
+                    className="text-xl px-12 py-6 shadow-2xl shadow-purple-500/25"
+                  >
+                    <Rocket className="mr-3 h-6 w-6" />
+                    Start Free Trial
+                  </InteractiveButton>
+                  <InteractiveButton variant="ghost" size="lg" className="text-xl px-12 py-6">
+                    <BookOpen className="mr-3 h-6 w-6" />
+                    View Demo
+                  </InteractiveButton>
+                </motion.div>
+
+                {/* Social Proof */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 1.6, duration: 0.6 }}
+                  className="flex items-center space-x-6 text-sm text-gray-600"
+                >
+                  <div className="flex items-center space-x-2">
+                    <div className="flex -space-x-2">
+                      {[1, 2, 3, 4].map((i) => (
+                        <div
+                          key={i}
+                          className="w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full border-2 border-white"
+                        ></div>
+                      ))}
+                    </div>
+                    <span>Trusted by 500+ teams</span>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="w-4 h-4 bg-yellow-400 rounded-full"></div>
+                    ))}
+                    <span className="ml-2">4.9/5 rating</span>
+                  </div>
+                </motion.div>
+              </motion.div>
+
+              {/* Right side - Enhanced Visualization */}
+              <motion.div
+                initial={{ opacity: 0, x: 50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.6, duration: 1 }}
+                className="relative"
+              >
+                {/* Main Dashboard Mockup */}
+                <div className="relative bg-white rounded-3xl shadow-2xl shadow-purple-500/20 border border-gray-200 overflow-hidden">
+                  {/* Header */}
+                  <div className="bg-gradient-to-r from-purple-600 to-pink-600 p-6">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-3">
+                        <div className="w-3 h-3 bg-white/30 rounded-full"></div>
+                        <div className="w-3 h-3 bg-white/30 rounded-full"></div>
+                        <div className="w-3 h-3 bg-white/30 rounded-full"></div>
+                      </div>
+                      <div className="text-white font-semibold">OnCall Mate Dashboard</div>
+                      <div className="w-8 h-8 bg-white/20 rounded-lg"></div>
+                    </div>
+                  </div>
+
+                  {/* Dashboard Content */}
+                  <div className="p-8 space-y-6">
+                    {/* Alert Status Cards */}
+                    <div className="grid grid-cols-3 gap-4">
+                      {[
+                        { label: "Active", count: "12", color: "bg-red-500", trend: "↓ 70%" },
+                        { label: "Resolved", count: "89", color: "bg-green-500", trend: "↑ 200%" },
+                        { label: "Pending", count: "3", color: "bg-yellow-500", trend: "↓ 85%" },
+                      ].map((stat, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: 1.8 + index * 0.1 }}
+                          className="bg-gray-50 rounded-xl p-4 text-center"
+                        >
+                          <div className={`w-4 h-4 ${stat.color} rounded-full mx-auto mb-2`}></div>
+                          <div className="text-2xl font-bold text-gray-800">{stat.count}</div>
+                          <div className="text-xs text-gray-600">{stat.label}</div>
+                          <div className="text-xs text-green-600 font-semibold mt-1">{stat.trend}</div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Live Alert Feed */}
+                    <div className="space-y-3">
+                      <h3 className="font-semibold text-gray-800 text-sm">Live Alert Feed</h3>
+                      {[
+                        {
+                          type: "Critical",
+                          service: "API Gateway",
+                          status: "Resolved",
+                          time: "2m ago",
+                          color: "bg-red-100 text-red-700",
+                        },
+                        {
+                          type: "Warning",
+                          service: "Database",
+                          status: "Investigating",
+                          time: "5m ago",
+                          color: "bg-yellow-100 text-yellow-700",
+                        },
+                        {
+                          type: "Info",
+                          service: "Cache",
+                          status: "Resolved",
+                          time: "8m ago",
+                          color: "bg-blue-100 text-blue-700",
+                        },
+                      ].map((alert, index) => (
+                        <motion.div
+                          key={index}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 2.2 + index * 0.2 }}
+                          className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                        >
+                          <div className="flex items-center space-x-3">
+                            <div className={`px-2 py-1 rounded text-xs font-medium ${alert.color}`}>{alert.type}</div>
+                            <span className="text-sm font-medium text-gray-800">{alert.service}</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-xs text-gray-600">{alert.status}</div>
+                            <div className="text-xs text-gray-500">{alert.time}</div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* AI Response Preview */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 2.8 }}
+                      className="bg-gradient-to-r from-purple-50 to-pink-50 rounded-xl p-4 border border-purple-200"
+                    >
+                      <div className="flex items-center space-x-2 mb-3">
+                        <Brain className="h-5 w-5 text-purple-600" />
+                        <span className="font-semibold text-purple-800">AI Assistant</span>
+                        <div className="flex space-x-1">
+                          <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                          <div
+                            className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"
+                            style={{ animationDelay: "0.2s" }}
+                          ></div>
+                          <div
+                            className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"
+                            style={{ animationDelay: "0.4s" }}
+                          ></div>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-700">
+                        "I've detected a database connection spike. Based on previous incidents, I recommend scaling the
+                        connection pool. Shall I execute the fix?"
+                      </p>
+                      <div className="flex space-x-2 mt-3">
+                        <button className="px-3 py-1 bg-purple-600 text-white text-xs rounded-lg">Execute</button>
+                        <button className="px-3 py-1 bg-gray-200 text-gray-700 text-xs rounded-lg">Review</button>
+                      </div>
+                    </motion.div>
+                  </div>
+                </div>
+
+                {/* Floating Elements */}
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 3, duration: 0.6 }}
+                  className="absolute -top-6 -right-6 bg-green-500 text-white px-4 py-2 rounded-full shadow-lg text-sm font-semibold"
+                >
+                  ✓ 99.9% Uptime
+                </motion.div>
+
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 3.2, duration: 0.6 }}
+                  className="absolute -bottom-6 -left-6 bg-blue-500 text-white px-4 py-2 rounded-full shadow-lg text-sm font-semibold"
+                >
+                  🚀 AI-Powered
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+
+          {/* Scroll Indicator */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 3.5 }}
+            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          >
+            <motion.div
+              animate={{ y: [0, 10, 0] }}
+              transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY }}
+              className="flex flex-col items-center space-y-2 text-gray-500"
+            >
+              <span className="text-sm">Scroll to explore</span>
+              <ChevronRight className="h-5 w-5 rotate-90" />
+            </motion.div>
+          </motion.div>
         </section>
 
         {/* Problem Statement */}
@@ -370,10 +759,14 @@ export default function OnCallMateLanding() {
                 whileInView={{ opacity: 1, y: 0 }}
                 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-4 bg-gradient-to-r from-orange-600 to-pink-600 bg-clip-text text-transparent"
               >
-                The Challenge We're Solving
+                Problems We're Solving
               </motion.h2>
               <p className="mx-auto max-w-[800px] text-gray-600 md:text-xl">
-                Modern businesses face critical challenges in incident management that can cost millions
+                Modern businesses face critical challenges in incident management areas like{" "}
+                <span className="font-semibold text-purple-600">monitoring</span>,{" "}
+                <span className="font-semibold text-orange-600">alerting</span>,{" "}
+                <span className="font-semibold text-pink-600">response coordination</span>, and{" "}
+                <span className="font-semibold text-blue-600">knowledge management</span> that can cost millions
               </p>
             </div>
             <div className="grid gap-8 lg:grid-cols-3">
@@ -381,8 +774,15 @@ export default function OnCallMateLanding() {
                 {
                   icon: AlertTriangle,
                   title: "Overwhelming volume of alerts",
-                  description:
-                    "SREs face a deluge of alerts from tools like Grafana, Prometheus, Datadog. Many alerts are not critical leading to noise.",
+                  description: (
+                    <>
+                      SREs face a deluge of alerts from tools like{" "}
+                      <span className="font-bold text-orange-600">Grafana</span>,{" "}
+                      <span className="font-bold text-blue-600">Prometheus</span>,{" "}
+                      <span className="font-bold text-purple-600">Datadog</span>. Many alerts are{" "}
+                      <span className="font-bold text-red-600">not critical</span> leading to noise.
+                    </>
+                  ),
                   stat: "300+ alerts/day average",
                   color: "from-purple-600 to-pink-600",
                   borderColor: "border-purple-200",
@@ -390,7 +790,13 @@ export default function OnCallMateLanding() {
                 {
                   icon: Clock,
                   title: "Knowledge gaps between SREs",
-                  description: "Junior SREs often lack the expertise. This results in delays and extended downtime.",
+                  description: (
+                    <>
+                      <span className="font-bold text-blue-600">Junior SREs</span> often lack the expertise. This
+                      results in <span className="font-bold text-red-600">delays</span> and{" "}
+                      <span className="font-bold text-orange-600">extended downtime</span>.
+                    </>
+                  ),
                   stat: "45min average MTTR",
                   color: "from-orange-600 to-pink-600",
                   borderColor: "border-orange-200",
@@ -398,8 +804,13 @@ export default function OnCallMateLanding() {
                 {
                   icon: Users,
                   title: "Unnecessary escalation and delays",
-                  description:
-                    "Lack of documented solutions leads to frequent escalations. Senior engineers are diverted from critical tasks affecting productivity.",
+                  description: (
+                    <>
+                      Lack of <span className="font-bold text-green-600">documented solutions</span> leads to frequent
+                      escalations. <span className="font-bold text-purple-600">Senior engineers</span> are diverted from
+                      critical tasks affecting <span className="font-bold text-orange-600">productivity</span>.
+                    </>
+                  ),
                   stat: "60% communication gaps",
                   color: "from-pink-600 to-purple-600",
                   borderColor: "border-pink-200",
@@ -445,7 +856,7 @@ export default function OnCallMateLanding() {
                 Key Features
               </motion.h2>
               <p className="mx-auto max-w-[800px] text-gray-600 md:text-xl mb-8">
-                Essential tools for intelligent alert management
+                Essential tools for <span className="font-semibold text-purple-600">intelligent alert management</span>
               </p>
             </div>
 
@@ -470,8 +881,11 @@ export default function OnCallMateLanding() {
                   Intelligent Incident Response, Simplified
                 </h2>
                 <p className="text-gray-600 md:text-xl leading-relaxed mb-8 max-w-4xl mx-auto">
-                  OnCall Mate transforms chaos into clarity with AI-powered alert management, smart escalations, and
-                  unified incident tracking that gets your team back to building.
+                  OnCall Mate transforms chaos into clarity with{" "}
+                  <span className="font-semibold text-purple-600">AI-powered alert management</span>,{" "}
+                  <span className="font-semibold text-orange-600">smart escalations</span>, and
+                  <span className="font-semibold text-pink-600"> unified incident tracking</span> that gets your team
+                  back to building.
                 </p>
               </div>
 
@@ -480,22 +894,31 @@ export default function OnCallMateLanding() {
                   {
                     icon: Brain,
                     title: "AI powered automated responses",
-                    description:
-                      "Integrated AI agent to automatically respond to alerts via emails, Slack and Outlook. Provide step-by-step resolutions for alerts reducing response time and manual effort.",
+                    description: [
+                      "Integrated AI agent to automatically respond to alerts via emails, Slack and Outlook",
+                      "Provide step-by-step resolutions for alerts reducing response time",
+                      "Minimize manual effort with intelligent automation",
+                    ],
                     color: "from-purple-600 to-pink-600",
                   },
                   {
                     icon: ZapIcon,
                     title: "Centralized knowledge database",
-                    description:
-                      "Maintain a database of previously resolved issues for quick reference. Utilized Redis in-memory DB for faster query processing, cost efficient, and efficient data retrieval between LLM and backend.",
+                    description: [
+                      "Maintain a database of previously resolved issues for quick reference",
+                      "Utilized Redis in-memory DB for faster query processing",
+                      "Cost efficient and efficient data retrieval between LLM and backend",
+                    ],
                     color: "from-orange-600 to-pink-600",
                   },
                   {
                     icon: Activity,
                     title: "Streamlined alert resolution",
-                    description:
-                      "Ensure consistent and accurate responses to common alerts. Minimize unnecessary escalations by equipping SREs with immediate solutions.",
+                    description: [
+                      "Ensure consistent and accurate responses to common alerts",
+                      "Minimize unnecessary escalations by equipping SREs with immediate solutions",
+                      "Reduce MTTR with intelligent alert prioritization",
+                    ],
                     color: "from-pink-600 to-purple-600",
                   },
                 ].map((benefit, index) => (
@@ -505,15 +928,24 @@ export default function OnCallMateLanding() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                     whileHover={{ y: -5 }}
-                    className="text-center space-y-4"
+                    className="text-left space-y-4"
                   >
-                    <div
-                      className={`bg-gradient-to-br ${benefit.color} p-4 rounded-xl w-16 h-16 mx-auto flex items-center justify-center shadow-lg shadow-purple-500/20`}
-                    >
-                      <benefit.icon className="h-8 w-8 text-white" />
+                    <div className="text-center">
+                      <div
+                        className={`bg-gradient-to-br ${benefit.color} p-4 rounded-xl w-16 h-16 mx-auto flex items-center justify-center shadow-lg shadow-purple-500/20 mb-4`}
+                      >
+                        <benefit.icon className="h-8 w-8 text-white" />
+                      </div>
+                      <h3 className="font-semibold text-gray-800 text-lg mb-4">{benefit.title}</h3>
                     </div>
-                    <h3 className="font-semibold text-gray-800 text-lg">{benefit.title}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{benefit.description}</p>
+                    <ul className="space-y-2">
+                      {benefit.description.map((point, idx) => (
+                        <li key={idx} className="flex items-start space-x-2">
+                          <div className="w-2 h-2 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                          <span className="text-gray-600 text-sm leading-relaxed">{point}</span>
+                        </li>
+                      ))}
+                    </ul>
                   </motion.div>
                 ))}
               </div>
@@ -533,7 +965,8 @@ export default function OnCallMateLanding() {
                 Business Value & Impact
               </motion.h2>
               <p className="mx-auto max-w-[800px] text-gray-600 md:text-xl">
-                Measurable benefits that drive real business outcomes
+                Measurable benefits that drive{" "}
+                <span className="font-semibold text-purple-600">real business outcomes</span>
               </p>
             </div>
             <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
@@ -616,7 +1049,8 @@ export default function OnCallMateLanding() {
                 Future Scope & Roadmap
               </motion.h2>
               <p className="mx-auto max-w-[800px] text-gray-600 md:text-xl">
-                Our vision for the future of intelligent incident management
+                Our vision for the future of{" "}
+                <span className="font-semibold text-purple-600">intelligent incident management</span>
               </p>
             </div>
 
@@ -705,7 +1139,7 @@ export default function OnCallMateLanding() {
                           <div className="space-y-2">
                             {item.features.map((feature, idx) => (
                               <div key={idx} className="flex items-center space-x-2">
-                                <CheckCircle className="h-4 w-4 text-purple-500" />
+                                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
                                 <span className="text-sm text-gray-600">{feature}</span>
                               </div>
                             ))}
@@ -739,7 +1173,7 @@ export default function OnCallMateLanding() {
                 Seamless Integrations
               </motion.h2>
               <p className="mx-auto max-w-[800px] text-gray-600 md:text-xl">
-                Connect with your favorite tools and platforms
+                Connect with your <span className="font-semibold text-purple-600">favorite tools</span> and platforms
               </p>
             </div>
 
@@ -785,7 +1219,8 @@ export default function OnCallMateLanding() {
                   Get in Touch
                 </motion.h2>
                 <p className="text-gray-600 md:text-xl leading-relaxed">
-                  Ready to transform your incident response? Let's talk about how OnCall Mate can help your team.
+                  Ready to <span className="font-semibold text-purple-600">transform your incident response</span>?
+                  Let's talk about how OnCall Mate can help your team.
                 </p>
               </div>
 
@@ -892,355 +1327,6 @@ export default function OnCallMateLanding() {
 
       {/* Floating Action Button */}
       <FloatingActionButton />
-    </div>
-  )
-}
-
-
-
-
-
-
-"use client"
-import { Card } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { AlertTriangle, ArrowLeft, Sparkles, Rocket, Code, Palette, Database, Shield, Zap } from "lucide-react"
-import Link from "next/link"
-import { motion } from "framer-motion"
-import { InteractiveButton } from "@/components/ui/interactive-button"
-import { FloatingParticles } from "@/components/ui/floating-particles"
-
-// Team member data - simplified for freshers
-const teamMembers = [
-  {
-    id: 1,
-    name: "Arjun Sharma",
-    role: "Full Stack Developer",
-    avatar: "/placeholder.svg?height=300&width=300&query=professional+headshot+indian+male+developer",
-    gradient: "from-purple-600 to-pink-600",
-    icon: Code,
-  },
-  {
-    id: 2,
-    name: "Priya Patel",
-    role: "Frontend Developer",
-    avatar: "/placeholder.svg?height=300&width=300&query=professional+headshot+indian+female+frontend",
-    gradient: "from-orange-600 to-pink-600",
-    icon: Palette,
-  },
-  {
-    id: 3,
-    name: "Rohit Kumar",
-    role: "Backend Developer",
-    avatar: "/placeholder.svg?height=300&width=300&query=professional+headshot+indian+male+backend",
-    gradient: "from-pink-600 to-purple-600",
-    icon: Database,
-  },
-  {
-    id: 4,
-    name: "Sneha Reddy",
-    role: "UI/UX Designer",
-    avatar: "/placeholder.svg?height=300&width=300&query=professional+headshot+indian+female+designer",
-    gradient: "from-purple-600 to-orange-600",
-    icon: Sparkles,
-  },
-  {
-    id: 5,
-    name: "Vikram Singh",
-    role: "DevOps Engineer",
-    avatar: "/placeholder.svg?height=300&width=300&query=professional+headshot+indian+male+devops",
-    gradient: "from-orange-600 to-purple-600",
-    icon: Rocket,
-  },
-  {
-    id: 6,
-    name: "Ananya Gupta",
-    role: "Security Specialist",
-    avatar: "/placeholder.svg?height=300&width=300&query=professional+headshot+indian+female+security",
-    gradient: "from-pink-600 to-orange-600",
-    icon: Shield,
-  },
-  {
-    id: 7,
-    name: "Karthik Nair",
-    role: "AI/ML Engineer",
-    avatar: "/placeholder.svg?height=300&width=300&query=professional+headshot+indian+male+ai",
-    gradient: "from-purple-600 to-pink-600",
-    icon: Zap,
-  },
-]
-
-// Team member card component - simplified
-const TeamMemberCard = ({ member, index }: { member: any; index: number }) => {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50, scale: 0.9 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{
-        delay: index * 0.1,
-        type: "spring",
-        stiffness: 100,
-        damping: 15,
-      }}
-      whileHover={{ y: -10, scale: 1.02 }}
-      className="group"
-    >
-      <Card className="overflow-hidden bg-white border-2 border-gray-200 hover:border-purple-300 transition-all duration-500 hover:shadow-xl hover:shadow-purple-500/20">
-        <div className="relative">
-          {/* Background gradient */}
-          <div className={`absolute inset-0 bg-gradient-to-br ${member.gradient} opacity-10`} />
-
-          {/* Avatar section */}
-          <div className="relative p-8 text-center">
-            <motion.div
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 300 }}
-              className="relative mx-auto mb-6"
-            >
-              <div
-                className={`w-32 h-32 rounded-full bg-gradient-to-br ${member.gradient} p-1 shadow-lg shadow-purple-500/20`}
-              >
-                <img
-                  src={member.avatar || "/placeholder.svg"}
-                  alt={member.name}
-                  className="w-full h-full rounded-full object-cover bg-white"
-                />
-              </div>
-              <motion.div
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                transition={{ delay: index * 0.1 + 0.3, type: "spring" }}
-                className={`absolute -bottom-2 -right-2 w-10 h-10 bg-gradient-to-br ${member.gradient} rounded-full flex items-center justify-center shadow-lg shadow-purple-500/20`}
-              >
-                <member.icon className="h-5 w-5 text-white" />
-              </motion.div>
-            </motion.div>
-
-            <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} transition={{ delay: index * 0.1 + 0.2 }}>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">{member.name}</h3>
-              <Badge className={`bg-gradient-to-r ${member.gradient} text-white border-0 mb-4`}>{member.role}</Badge>
-            </motion.div>
-          </div>
-        </div>
-      </Card>
-    </motion.div>
-  )
-}
-
-export default function TeamPage() {
-  return (
-    <div className="flex flex-col min-h-screen bg-white relative overflow-hidden">
-      <FloatingParticles />
-
-      {/* Header */}
-      <header className="absolute top-4 left-4 right-4 z-50 flex justify-between items-center">
-        <Link href="/" className="flex items-center group">
-          <motion.div
-            whileHover={{ rotate: 360, scale: 1.05 }}
-            transition={{ duration: 0.6, type: "spring" }}
-            className="p-2 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg shadow-lg shadow-purple-500/20 mr-3"
-          >
-            <AlertTriangle className="h-6 w-6 text-white" />
-          </motion.div>
-          <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            OnCall Mate
-          </span>
-        </Link>
-
-        <Link href="/">
-          <InteractiveButton variant="ghost" size="sm" className="text-sm">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Home
-          </InteractiveButton>
-        </Link>
-      </header>
-
-      <main className="flex-1 pt-24">
-        {/* Hero Section */}
-        <section className="w-full py-16 md:py-24 relative overflow-hidden bg-white">
-          <div className="container px-4 md:px-6 relative">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, type: "spring", stiffness: 100 }}
-              className="text-center mb-16"
-            >
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.2, type: "spring" }}
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-600/10 to-pink-600/10 rounded-full border border-purple-200 mb-6"
-              >
-                <Sparkles className="h-4 w-4 mr-2 text-purple-600" />
-                <span className="text-sm font-medium text-purple-600">Fresh Minds, Bold Ideas</span>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl mb-6 bg-gradient-to-r from-purple-600 to-orange-600 bg-clip-text text-transparent"
-              >
-                Meet Our Founding Team
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mx-auto max-w-[700px] text-gray-600 md:text-lg leading-relaxed"
-              >
-                A passionate team of fresh graduates and young professionals bringing innovative perspectives to solve
-                real-world problems. This is our first venture, and we're excited to make a difference!
-              </motion.p>
-            </motion.div>
-
-            {/* Team Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-              className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto mb-20"
-            >
-              {[
-                { label: "Team Members", value: "7", icon: "👥" },
-                { label: "Fresh Graduates", value: "100%", icon: "🎓" },
-                { label: "Passion Level", value: "∞", icon: "🔥" },
-                { label: "First Company", value: "Yes!", icon: "🚀" },
-              ].map((stat, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.7 + index * 0.1, type: "spring" }}
-                  className="text-center"
-                >
-                  <div className="text-2xl mb-2">{stat.icon}</div>
-                  <div className="text-2xl font-bold text-gray-800 mb-1">{stat.value}</div>
-                  <div className="text-sm text-gray-600">{stat.label}</div>
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Team Members Grid */}
-        <section className="w-full py-16 relative bg-white">
-          <div className="container px-4 md:px-6 relative">
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 max-w-7xl mx-auto">
-              {teamMembers.map((member, index) => (
-                <TeamMemberCard key={member.id} member={member} index={index} />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Why Fresh Graduates Section */}
-        <section className="w-full py-16 md:py-24 relative bg-white">
-          <div className="container px-4 md:px-6 relative">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 100 }}
-              className="text-center max-w-4xl mx-auto"
-            >
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl mb-6 bg-gradient-to-r from-orange-600 to-purple-600 bg-clip-text text-transparent">
-                Why Fresh Graduates Make Great Founders
-              </h2>
-              <div className="grid gap-8 md:grid-cols-3 mt-12">
-                {[
-                  {
-                    icon: "🧠",
-                    title: "Fresh Perspectives",
-                    description: "We bring new ideas without being constrained by 'how things have always been done'",
-                  },
-                  {
-                    icon: "⚡",
-                    title: "Boundless Energy",
-                    description: "Our enthusiasm and drive to prove ourselves fuels our dedication to excellence",
-                  },
-                  {
-                    icon: "🎯",
-                    title: "Latest Technologies",
-                    description: "We're up-to-date with cutting-edge tech and modern development practices",
-                  },
-                  {
-                    icon: "🤝",
-                    title: "Collaborative Spirit",
-                    description: "We believe in teamwork, learning from each other, and growing together",
-                  },
-                  {
-                    icon: "💡",
-                    title: "Innovation First",
-                    description: "We're not afraid to experiment and try new approaches to solve problems",
-                  },
-                  {
-                    icon: "🌟",
-                    title: "Hungry for Success",
-                    description: "This is our first company, and we're determined to make it a success story",
-                  },
-                ].map((item, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1, type: "spring", stiffness: 100 }}
-                    className="text-center space-y-4"
-                  >
-                    <div className="text-4xl mb-4">{item.icon}</div>
-                    <h3 className="text-lg font-semibold text-gray-800">{item.title}</h3>
-                    <p className="text-gray-600 text-sm leading-relaxed">{item.description}</p>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* Call to Action */}
-        <section className="w-full py-16 md:py-24 relative bg-white">
-          <div className="container px-4 md:px-6 relative">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ type: "spring", stiffness: 100 }}
-              className="text-center max-w-3xl mx-auto"
-            >
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl mb-6 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-                Join Our Journey
-              </h2>
-              <p className="text-gray-600 md:text-lg leading-relaxed mb-8">
-                We're just getting started, and we'd love to have you along for the ride. Whether you're a potential
-                customer, investor, or fellow entrepreneur, let's connect!
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <InteractiveButton variant="primary" size="lg">
-                  <Rocket className="mr-2 h-5 w-5" />
-                  Get Started
-                </InteractiveButton>
-                <InteractiveButton variant="secondary" size="lg">
-                  <Sparkles className="mr-2 h-5 w-5" />
-                  Learn More
-                </InteractiveButton>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-      </main>
-
-      {/* Footer */}
-      <footer className="py-8 border-t border-gray-200 relative bg-white">
-        <div className="container px-4 md:px-6 relative">
-          <div className="flex flex-col sm:flex-row justify-between items-center">
-            <p className="text-xs text-gray-600">© 2025 OnCall Mate. All rights reserved.</p>
-            <div className="flex items-center space-x-4 mt-4 sm:mt-0">
-              <Link href="/" className="text-xs text-gray-600 hover:text-purple-600 transition-colors">
-                Back to Home
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
